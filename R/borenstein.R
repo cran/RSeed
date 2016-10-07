@@ -1,13 +1,6 @@
 setMethod("initialize", signature(.Object="RSeed"),
 	function(.Object, model, connectedComponentCutOff=10, currencyMetabolites){
-		packs <- c(sybil=require(sybil), graph=require(graph), RBGL=require(RBGL))
-		
 		.Object@env <- new.env()
-		
-		if(!all(packs)){
-			print(packs)
-			stop("missing packages")
-		}
 		
 		if(class(model) != "modelorg"){
 			stop("need modelorg")
@@ -104,7 +97,7 @@ setMethod("buildGraph", signature(rs="RSeed"),
 			met_id(model) <- met_id(model)[-pos]
 			met_comp(model) <- met_comp(model)[-pos]
 			met_single(model) <- met_single(model)[-pos]
-			rhs(model) <- rhs(model)[-pos]
+			#rhs(model) <- rhs(model)[-pos]
 
 			met_num(model) <- met_num(model) - length(pos)
 		
@@ -288,7 +281,7 @@ setMethod("findCurrencyMetabolites", signature(object = "modelorg"),
 
 setMethod("plot", signature(x="RSeed", y="missing"),
 	function(x, ...){
-		if(!isTRUE(require("Rgraphviz"))){
+		if(!isTRUE(requireNamespace("Rgraphviz"))){
 			stop("need Rgraphviz")
 		}
 		
@@ -310,7 +303,7 @@ setMethod("plot", signature(x="RSeed", y="missing"),
 			graph_scc(rs) <- g_scc
 		}
 		
-		layout(matrix(data = 1:3, nrow = 1, ncol = 3), 
+		graphics::layout(matrix(data = 1:3, nrow = 1, ncol = 3), 
 				widths = c(8, 1, 1), heights = c(1))
 		
 		len <- sapply(scc(rs), length)
@@ -325,10 +318,10 @@ setMethod("plot", signature(x="RSeed", y="missing"),
 		uSeed <- unique(len[isSeed,1])
 		unSeed <- unique(len[!isSeed,1])
 		
-		seedcolors <- rainbow(length(uSeed), start=0.3, end=0.7)
+		seedcolors <- grDevices::rainbow(length(uSeed), start=0.3, end=0.7)
 		names(seedcolors) <- uSeed
 		
-		nseedcolors <- rainbow(length(unSeed), start=0.8, end=0.2)
+		nseedcolors <- grDevices::rainbow(length(unSeed), start=0.8, end=0.2)
 		names(nseedcolors) <- unSeed
 		
 		
@@ -350,34 +343,31 @@ setMethod("plot", signature(x="RSeed", y="missing"),
 		gattrs <- list(node = list(shape = "box", fixedsize = FALSE))
 		
 		dn <- function(node, ur, attrs, radConv) {
-			nodeCenter <- getNodeCenter(node)
-			nodeX <- getX(nodeCenter)
-			nodeY <- getY(nodeCenter)
-			lw <- getNodeLW(node)
-			rw <- getNodeRW(node)
+			nodeCenter <- Rgraphviz::getNodeCenter(node)
+			nodeX <- Rgraphviz::getX(nodeCenter)
+			nodeY <- Rgraphviz::getY(nodeCenter)
+			lw <- Rgraphviz::getNodeLW(node)
+			rw <- Rgraphviz::getNodeRW(node)
 			rad <- (lw + rw)/2
-			height <- getNodeHeight(node)
-			fg <- color(node)
-			style <- style(node)
+			height <- Rgraphviz::getNodeHeight(node)
+			fg <- Rgraphviz::color(node)
+			style <- Rgraphviz::style(node)
 			if (fg == "") 
 				fg <- "black"
-			bg <- fillcolor(node)
+			bg <- Rgraphviz::fillcolor(node)
 			if (bg == "") {
 				if (style == "filled") 
 				    bg <- "grey"
 				else bg <- "transparent"
 			}
-			rect(nodeX - lw, nodeY - (height/2), nodeX + rw, nodeY + (height/2), col = bg, border = fg)
-		
+			graphics::rect(nodeX - lw, nodeY - (height/2), nodeX + rw, nodeY + (height/2), col = bg, border = fg)
 			#drawTxtLabel(txtLabel(node), xLoc = nodeX, yLoc = nodeY)
-	
-	
-			text(name(node), x=getX(nodeCenter), y=getY(nodeCenter), srt=90, cex=1)
+			graphics::text(Rgraphviz::name(node), x=Rgraphviz::getX(nodeCenter), y=Rgraphviz::getY(nodeCenter), srt=90, cex=1)
 		}
 
 
-		plot(agopen(graph_scc(rs), ..., nodeAttrs=nattrs, attrs=gattrs, name=""), drawNode=dn)
-		title(mod_name(model_original(rs)))
+		Rgraphviz::plot(Rgraphviz::agopen(graph_scc(rs), ..., nodeAttrs=nattrs, attrs=gattrs, name=""), drawNode=dn)
+		graphics::title(mod_name(model_original(rs)))
 		
 #		pie(1:10, col=rainbow(10))
 		
@@ -387,24 +377,24 @@ setMethod("plot", signature(x="RSeed", y="missing"),
 		m <- matrix(NA, nrow=9, ncol=length(uSeed))
 		m[5,] <- v1
 		
-		image(x=1:9, y=v1, z=m,
+		graphics::image(x=1:9, y=v1, z=m,
 				 col=seedcolors[order(uSeed)], ylab="", xlab="", xaxs="i", yaxs="i", xaxt='n', yaxt='n', bty='n')
-		axis(side=2, at=v1, labels=sort(uSeed))
-		title("Seeds")
+		graphics::axis(side=2, at=v1, labels=sort(uSeed))
+		graphics::title("Seeds")
 		
 		
 		v2 <- 1:length(unSeed)
 		m <- matrix(NA, nrow=9, ncol=length(unSeed))
 		m[5,] <- v2
 		
-		image(x=1:9, y=v2, z=m,
+		graphics::image(x=1:9, y=v2, z=m,
 				 col=nseedcolors[order(unSeed)], ylab="", xlab="", xaxt='n', yaxt='n', bty='n')
-		axis(side=2, at=v2, labels=sort(unSeed))
-		title("notSeeds")
+		graphics::axis(side=2, at=v2, labels=sort(unSeed))
+		graphics::title("notSeeds")
 		
 		
 		
-		layout(1)
+		graphics::layout(1)
 	}
 )
 
@@ -433,12 +423,6 @@ buildAdjacency <- function(model="modelorg", currencyMetabolites=NULL){
 
 	if(class(model) != "modelorg"){
 		stop("need modelorg")
-	}
-	
-	graphpackage <- require("graph")
-	
-	if(!isTRUE(graphpackage)){
-		stop("need graphpackage for this job")
 	}
 	
 	adj <- matrix(0, nrow=met_num(model), ncol=met_num(model))#, dimnames=list(met_id(model), met_id(model)))

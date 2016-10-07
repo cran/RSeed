@@ -1,18 +1,17 @@
 Package: RSeed
 Type: Package
-Title: borenstein analysis
-Version: 0.1.31
-Date: 2012-04-25
+Title: Borenstein Analysis
+Version: 0.1.60
+Date: 2016-10-07
 Author: Claus Jonathan Fritzemeier
-Maintainer: Claus Jonathan Fritzemeier
-        <clausjonathan.fritzemeier@uni-duesseldorf.de>
-Description: an implementation of the analysis about seed components
-        from borenstein 2008
+Maintainer: Claus Jonathan Fritzemeier <clausjonathan.fritzemeier@uni-duesseldorf.de>
+Description: An implementation of the analysis about seed components from Borenstein et.al. 2008.
 License: GNU General Public License
 LazyLoad: yes
 Depends: R (>= 2.15.0), methods, sybil, RBGL, graph
 Suggests: Rgraphviz
 Collate: RSeed-class.R borenstein.R
-Packaged: 2012-04-25 17:09:16 UTC; jonathan
+NeedsCompilation: no
+Packaged: 2016-10-07 07:46:24 UTC; jonathan
 Repository: CRAN
-Date/Publication: 2012-05-04 09:56:00
+Date/Publication: 2016-10-07 10:53:07
